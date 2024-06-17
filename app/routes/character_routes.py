@@ -44,54 +44,11 @@ def get_characters():
 
 @bp.get("/<char_id>/greetings")
 def get_greetings(char_id):
-    character = validate_model(Character, char_id)
-    
-    if not character.greetings:
-        return make_response(jsonify(f"No greetings found for {character.name} "), 201)
-    
-    response = {"Character Name" : character.name,
-                "Greetings" : []}
-    for greeting in character.greetings:
-        response["Greetings"].append({
-            "greeting" : greeting.greeting_text
-        })
-    
-    return jsonify(response)
+    pass
 
 @bp.post("/<char_id>/generate")
 def add_greetings(char_id):
-    character_obj = validate_model(Character, char_id)
-    greetings = generate_greetings(character_obj)
-    print(greetings)
-
-    if character_obj.greetings:
-        return make_response(jsonify(f"Greetings already generated for {character_obj.name} "), 201)
-    
-    new_greetings = []
-
-    for greeting in greetings:
-        text = greeting[greeting.find(" ")+1:]
-        new_greeting = Greeting(
-            greeting_text = text.strip("\""),
-            character = character_obj
-        )
-        new_greetings.append(new_greeting)
-    
-    db.session.add_all(new_greetings)
-    db.session.commit()
-
-    return make_response(jsonify(f"Greetings successfully added to {character_obj.name}"), 201)
-
-def generate_greetings(character):
-
-    input_message = f"I am writing a video game in the style of The Witcher. I have an npc named {character.name} who is {character.age} years old. They are a {character.occupation} who has a {character.personality} personality. Please generate a python style list of 10 stock phrases they might use when the main character talks to them"
-    completion = client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "user", "content": input_message}
-        ]
-    )
-    return(completion.choices[0].message.content.split("\n"))
+    pass
 
 def validate_model(cls,id):
     try:
