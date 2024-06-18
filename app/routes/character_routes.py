@@ -3,7 +3,7 @@ from ..db import db
 from ..models.character import Character
 from ..models.greeting import Greeting
 from sqlalchemy import func, union, except_
-from openai import OpenAI
+
 
 bp = Blueprint("characters", __name__, url_prefix="/characters")
 client = OpenAI()
