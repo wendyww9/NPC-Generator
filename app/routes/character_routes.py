@@ -6,7 +6,6 @@ from sqlalchemy import func, union, except_
 
 
 bp = Blueprint("characters", __name__, url_prefix="/characters")
-client = OpenAI()
 
 @bp.post("")
 def create_character():
