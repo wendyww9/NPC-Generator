@@ -4,7 +4,6 @@ from ..models.character import Character
 from ..models.greeting import Greeting
 from sqlalchemy import func, union, except_
 
-
 bp = Blueprint("characters", __name__, url_prefix="/characters")
 
 @bp.post("")
@@ -47,6 +46,9 @@ def get_greetings(char_id):
 
 @bp.post("/<char_id>/generate")
 def add_greetings(char_id):
+    pass
+
+def generate_greetings(character):
     pass
 
 def validate_model(cls,id):
