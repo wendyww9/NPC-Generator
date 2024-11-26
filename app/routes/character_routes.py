@@ -55,7 +55,7 @@ def validate_model(cls,id):
     try:
         id = int(id)
     except:
-        response =  response = {"message": f"{cls.__name__} {id} invalid"}
+        response = {"message": f"{cls.__name__} {id} invalid"}
         abort(make_response(response , 400))
 
     query = db.select(cls).where(cls.id == id)
