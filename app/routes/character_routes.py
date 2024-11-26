@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, abort, make_response
+from flask import Blueprint, request, abort, make_response
 from ..db import db
 from ..models.character import Character
 from ..models.greeting import Greeting
@@ -15,7 +15,7 @@ def create_character():
         db.session.add(new_character)
         db.session.commit()
 
-        return make_response(new_character.to_dict(), 201)
+        return new_character.to_dict(), 201
     
     except KeyError as e:
         abort(make_response({"message": f"missing required value: {e}"}, 400))
@@ -38,7 +38,7 @@ def get_characters():
             }
         )
 
-    return jsonify(response)
+    return response
 
 @bp.get("/<char_id>/greetings")
 def get_greetings(char_id):
