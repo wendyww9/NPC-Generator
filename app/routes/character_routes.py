@@ -3,7 +3,10 @@ from ..db import db
 from ..models.character import Character
 from ..models.greeting import Greeting
 from sqlalchemy import func, union, except_
+import google.generativeai as genai 
+import os
 
+genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
 bp = Blueprint("characters", __name__, url_prefix="/characters")
 
 @bp.post("")
@@ -42,14 +45,52 @@ def get_characters():
 
 @bp.get("/<char_id>/greetings")
 def get_greetings(char_id):
-    pass
+    character = validate_model(Character, char_id)
+    
+    if not character.greetings:
+        return {"message": f"No greetings found for {character.name} "}, 201
+    
+    response = {"Character Name" : character.name,
+                "Greetings" : []}
+    for greeting in character.greetings:
+        response["Greetings"].append({
+            "greeting" : greeting.greeting_text
+        })
+    
+    return response
+
+
 
 @bp.post("/<char_id>/generate")
 def add_greetings(char_id):
-    pass
+    character_obj = validate_model(Character, char_id)
+    greetings = generate_greetings(character_obj)
+
+    if character_obj.greetings:
+        return {"message": f"Greetings already generated for {character_obj.name} "}, 201
+    
+    new_greetings = []
+
+    for greeting in greetings:
+        new_greeting = Greeting(
+            greeting_text = greeting.strip("\""), #Removes quotes from each string
+            character = character_obj
+        )
+        new_greetings.append(new_greeting)
+    
+    db.session.add_all(new_greetings)
+    db.session.commit()
+
+    return {"message": f"Greetings successfully added to {character_obj.name}"}, 201
 
 def generate_greetings(character):
-    pass
+    model = genai.GenerativeModel("gemini-1.5-flash")
+    input_message = f"I am writing a fantasy RPG video game. I have an npc named {character.name} who is {character.age} years old. They are a {character.occupation} who has a {character.personality} personality. Please generate a Python style list of 10 stock phrases they might use when the main character talks to them. Please return just the list without a variable name and square brackets."
+    response = model.generate_content(input_message)
+    response_split = response.text.split("\n")
+
+    return response_split[:-1]
+
 
 def validate_model(cls,id):
     try:
